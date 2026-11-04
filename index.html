@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101c2b">
+<meta name="description" content="Controle de caixa diário da Lavação Central">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Lavação Central | Caixa</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121e2e;--panel2:#1a2a3e;--line:#2b4058;--blue:#1687e8;--green:#25b879;--muted:#a7b6c8;--white:#f6f8fb;--red:#ff6474}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) 14px calc(20px + env(safe-area-inset-bottom))}
+main{max-width:720px;margin:auto}.top{background:linear-gradient(135deg,#142a42,#0e1725);border:1px solid var(--line);border-radius:20px;padding:20px;margin:10px 0 16px}
+.brand{display:flex;align-items:center;justify-content:space-between}.brand h1{font-size:22px;letter-spacing:.5px;margin:0}.brand p{color:#9fc8ef;font-size:11px;letter-spacing:2px;margin:4px 0}.car{font-size:36px}.date{margin-top:16px}
+label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}input,select,textarea{width:100%;background:#0c1725;border:1px solid var(--line);border-radius:11px;padding:13px;color:var(--white);font:inherit;min-height:48px}textarea{min-height:75px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid #1687e8;border-color:transparent}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:12px}
+h2{font-size:18px;margin:20px 0 10px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat,.panel,.entry{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px}.stat small{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:24px;margin-top:5px}.green{color:#55dfa4}
+button{border:0;border-radius:12px;padding:13px 15px;font:600 15px system-ui;cursor:pointer;min-height:46px}.primary{background:var(--blue);color:white;width:100%}.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--white)}.danger{background:#3a1c29;color:#ff9eaa;padding:8px 11px;min-height:36px;font-size:13px}
+.paymentrow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);color:var(--muted);font-size:14px}.paymentrow:last-child{border:0}
+.entry{margin:9px 0}.entrytop{display:flex;justify-content:space-between;gap:10px}.entrytop strong{font-size:16px}.amount{font-weight:700;color:#55dfa4;white-space:nowrap}.meta{color:var(--muted);font-size:13px;margin-top:7px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.obs{color:#c3d0df;font-size:13px;margin-top:8px}.entryactions{display:flex;justify-content:flex-end;margin-top:8px}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.empty{text-align:center;color:var(--muted);padding:24px 12px}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin:14px 2px}.pill{background:#163958;color:#a9d7ff;border-radius:20px;padding:4px 9px;font-size:12px}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.stat strong{font-size:21px}}
+</style>
+</head>
+<body><main>
+<header class="top">
+ <div class="brand"><div><h1>LAVAÇÃO CENTRAL</h1><p>CONTROLE DE CAIXA</p></div><div class="car">🚘</div></div>
+ <div class="date field"><label for="workDate">Data do movimento</label><input id="workDate" type="date"></div>
+</header>
+<section class="stats">
+ <div class="stat"><small>Faturamento do dia</small><strong class="green" id="total">R$ 0,00</strong></div>
+ <div class="stat"><small>Veículos atendidos</small><strong id="count">0</strong></div>
+</section>
+<h2>Adicionar serviço</h2>
+<form class="panel" id="serviceForm">
+ <div class="field"><label for="client">Nome do cliente *</label><input id="client" required placeholder="Ex.: João Silva"></div>
+ <div class="grid">
+  <div class="field"><label for="vehicle">Veículo *</label><input id="vehicle" required placeholder="Ex.: BMW 320i"></div>
+  <div class="field"><label for="plate">Placa *</label><input id="plate" required placeholder="ABC1D23" maxlength="8"></div>
+ </div>
+ <div class="grid">
+  <div class="field"><label for="amount">Valor (R$) *</label><input id="amount" required type="number" min="0.01" step="0.01" placeholder="80,00"></div>
+  <div class="field"><label for="delivery">Hora de entrega *</label><input id="delivery" required type="time"></div>
+ </div>
+ <div class="field"><label for="payment">Forma de pagamento *</label><select id="payment"><option>Pix</option><option>Dinheiro</option><option>Cartão de débito</option><option>Cartão de crédito</option><option>Transferência</option><option>A receber</option></select></div>
+ <div class="field"><label for="notes">Observação</label><textarea id="notes" placeholder="Informações adicionais..."></textarea></div>
+ <button class="primary" type="submit">＋ Registrar serviço</button>
+</form>
+<h2>Resumo por pagamento</h2><section class="panel" id="paymentSummary"></section>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2>Serviços do dia</h2><span class="pill" id="listDate"></span></div>
+<section id="entries"></section>
+<div class="tools"><button class="secondary" id="csvBtn">⬇ Exportar Excel (CSV)</button><button class="secondary" id="backupBtn">Salvar backup</button><button class="secondary" id="restoreBtn">Restaurar backup</button><button class="secondary" id="installBtn" hidden>Instalar aplicativo</button></div>
+<input id="backupFile" type="file" accept="application/json" hidden>
+<p class="hint">Seus registros ficam salvos neste aparelho e navegador. Faça backups regularmente e não limpe os dados do navegador sem antes exportar. Para instalar como aplicativo, esta pasta precisa estar publicada em um endereço HTTPS; veja o LEIA-ME incluído.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const STORE='lavacao-central-caixa-v1';
+const methods=['Pix','Dinheiro','Cartão de débito','Cartão de crédito','Transferência','A receber'];
+let records=JSON.parse(localStorage.getItem(STORE)||'[]');
+let deferredPrompt=null;
+const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+$('workDate').value=today();
+const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const save=()=>localStorage.setItem(STORE,JSON.stringify(records));
+function render(){
+ const date=$('workDate').value;const list=records.filter(r=>r.date===date).sort((a,b)=>b.created-a.created);
+ const total=list.reduce((s,r)=>s+Number(r.amount),0);
+ $('total').textContent=money(total);$('count').textContent=list.length;$('listDate').textContent=date.split('-').reverse().join('/');
+ $('paymentSummary').innerHTML=methods.map(m=>`<div class="paymentrow"><span>${m}</span><strong>${money(list.filter(r=>r.payment===m).reduce((s,r)=>s+Number(r.amount),0))}</strong></div>`).join('')+`<div class="paymentrow" style="color:white;font-weight:700"><span>Total</span><strong class="green">${money(total)}</strong></div>`;
+ $('entries').innerHTML=list.length?list.map(r=>`<article class="entry"><div class="entrytop"><strong>${esc(r.client)}</strong><span class="amount">${money(r.amount)}</span></div><div>${esc(r.vehicle)} · ${esc(r.plate)}</div><div class="meta"><span>🕒 Entrega: ${esc(r.delivery)}</span><span>${esc(r.payment)}</span></div>${r.notes?`<div class="obs">Obs.: ${esc(r.notes)}</div>`:''}<div class="entryactions"><button class="danger" data-delete="${r.id}">Excluir</button></div></article>`).join(''):'<div class="panel empty">Nenhum serviço registrado nesta data.</div>';
+}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('serviceForm').addEventListener('submit',e=>{
+ e.preventDefault();const amount=Number($('amount').value);
+ if(!Number.isFinite(amount)||amount<=0)return;
+ records.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),date:$('workDate').value,client:$('client').value.trim(),vehicle:$('vehicle').value.trim(),plate:$('plate').value.trim().toUpperCase(),amount,delivery:$('delivery').value,payment:$('payment').value,notes:$('notes').value.trim(),created:Date.now()});
+ save();e.target.reset();$('client').focus();render();
+});
+$('entries').addEventListener('click',e=>{const id=e.target.dataset.delete;if(!id)return;if(confirm('Excluir este lançamento?')){records=records.filter(r=>String(r.id)!==String(id));save();render()}});
+$('workDate').addEventListener('change',render);
+$('csvBtn').onclick=()=>{
+ const rows=[['Data','Cliente','Veículo','Placa','Valor','Hora de entrega','Pagamento','Observação'],...records.filter(r=>r.date===$('workDate').value).map(r=>[r.date,r.client,r.vehicle,r.plate,String(r.amount).replace('.',','),r.delivery,r.payment,r.notes])];
+ const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+ download(new Blob([csv],{type:'text/csv;charset=utf-8'}),`caixa-lavacao-${$('workDate').value}.csv`);
+};
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+$('backupBtn').onclick=()=>download(new Blob([JSON.stringify(records,null,2)],{type:'application/json'}),'backup-lavacao-central.json');
+$('restoreBtn').onclick=()=>$('backupFile').click();
+$('backupFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw Error();if(confirm('Restaurar backup? Os registros atuais serão substituídos.')){records=data;save();render()}}catch{alert('Arquivo de backup inválido.')}e.target.value=''};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').hidden=false});
+$('installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').hidden=true};
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script>
+</body></html>

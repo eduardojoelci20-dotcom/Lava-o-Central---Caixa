@@ -1,0 +1,25 @@
+LAVAÇÃO CENTRAL — CONTROLE DE CAIXA
+
+O QUE ESTÁ INCLUÍDO
+- Cadastro de cliente, veículo, placa, valor, hora de entrega, pagamento e observações.
+- Resumo do dia e total por forma de pagamento.
+- Histórico por data, exclusão de lançamentos e exportação CSV compatível com Excel.
+- Backup e restauração em JSON.
+- Aplicativo web instalável (PWA), com cache para abrir depois de instalado.
+
+IMPORTANTE
+Este pacote é um aplicativo web progressivo (PWA), não um APK Android. Para instalar com ícone e abrir em tela cheia, publique os arquivos em um endereço HTTPS.
+
+PUBLICAÇÃO GRATUITA (exemplo com GitHub Pages)
+1. No computador, entre em github.com e crie uma conta, se ainda não tiver.
+2. Crie um repositório público chamado lavacao-central-caixa.
+3. Envie TODOS os arquivos desta pasta para a raiz do repositório.
+4. No repositório, abra Settings > Pages.
+5. Em Build and deployment, escolha Deploy from a branch; selecione a branch main e a pasta /(root), depois Save.
+6. Aguarde a publicação. O GitHub mostrará um endereço HTTPS para o site.
+7. No Android, abra esse endereço no Google Chrome.
+8. Toque no menu ⋮ e escolha “Instalar app” ou “Adicionar à tela inicial”.
+9. Confirme. O ícone “Caixa Central” aparecerá na tela do celular.
+
+DADOS E PRIVACIDADE
+Os lançamentos ficam armazenados localmente no navegador/aparelho (localStorage), não são sincronizados entre aparelhos e podem ser perdidos se os dados do navegador forem apagados. Use “Salvar backup” regularmente e guarde o arquivo em local seguro. Para uso em mais de um celular ou acesso compartilhado, será necessário adicionar um banco de dados e autenticação.
